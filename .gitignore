@@ -1,3 +1,7 @@
+# Credentials
+.git/config
+~/.git-credentials
+
 # History files
 .Rhistory
 .Rapp.history
