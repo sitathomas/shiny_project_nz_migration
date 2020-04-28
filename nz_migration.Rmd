@@ -13,6 +13,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(ggthemes)
+library(scales)
 
 ```
 
@@ -47,8 +48,9 @@ data %>%
 	group_by(year) %>% 
 	summarise(., total = sum(total_occupations)) %>% 
 	ggplot(., aes(x = year, y = total)) +
-		geom_bar(stat = "identity", fill = "sienna3") +
-		labs(title = "Net Permanent and Long-Term Migration to New Zealand by Year",
+		geom_col(fill = "sienna3") +
+		labs(
+			title = "Net Permanent and Long-Term Migration to New Zealand by Year",
 			subtitle = "ANZSCO Major Occupations, 2010 - 2017",
 			x = "Year", y = "All Major ANZSCO Occupations") +
 		theme_few()
@@ -66,13 +68,13 @@ data %>%
 data %>% 
 	group_by(quarter) %>% 
 	summarise(., total = sum(total_occupations)) %>% 
-	ggplot(., aes(x = quarter, y = total))+
-		geom_bar(stat = "identity", fill = "sienna3") +
-		labs(title = "Net Permanent and Long-Term Migration to New Zealand by Quarter",
+	ggplot(., aes(x = quarter, y = total)) +
+		geom_col(fill = "sienna3", width = .5) +
+		labs(
+			title = "Net Permanent and Long-Term Migration to New Zealand by Quarter",
 			subtitle = "ANZSCO Major Occupations, 2010 - 2017",
 			x = "Quarter", y = "All Major ANZSCO Occupations") +
 		theme_few()
-
 ```
 
 
@@ -81,9 +83,41 @@ data %>%
 
 ## Exploring Net Migration by Occupation
 
-```{r}
+```{r by_occupation, echo = F}
 
+data_spread <- data %>% 
+	pivot_longer(.,
+		cols = managers:labourers,
+		names_to = "occupation",
+		values_to = "occupation_count"
+	) %>% 
+	group_by(., occupation) %>% 
+	summarise(., occupation_sum = sum(occupation_count)) %>% 
+	ggplot(data = ., aes(y = occupation, x = occupation_sum)) +
+		geom_col(fill = "sienna3") +
+		labs(
+			title = "Net Permanent and Long-Term Migration to New Zealand by Occupation",
+			subtitle = "ANZSCO Major Occupations, 2010 - 2017",
+			y = "Occupation", x = "All Major ANZSCO Occupations"
+			) +
+		theme_few() +
+		scale_y_discrete(
+			labels = c(
+				"technicians__trades_workers" = "Technicians and Trades Workers",
+				"sales_workers" = "Sales Workers",
+				"professionals" = "Professionals",
+				"managers" = "Managers",
+				"machinery_operators__drivers" = "Machinery Operators and Drivers",
+				"labourers" = "Laborers",
+				"community__personal_service_workers" = "Community and Personal Service Workers",
+				"clerical__administrative_workers" = "Clerical and Administrative Workers"
+			)
+		)
 
+data_spread
 
 ```
 
+
+#### Conclusion: Exploring Net Permanent and Long-Term Migration by Occupation
+- Most permanent and long-term migrants are Professionals by far, while more Sales Workers and Machinery Operators and Drivers have departed New Zealand than have arrived.
