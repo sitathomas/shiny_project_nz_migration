@@ -33,20 +33,109 @@ colnames(major_occup) <- gsub(" ", "_", colnames(major_occup))
 colnames(major_occup) <- tolower(colnames(major_occup))
 colnames(major_occup)[13] = "total_occupations"
 
-arrivals_by_gender <-
-	read_csv("data/arrivals_by_gender.csv",
-		col_names = T,
-		skip = 4)
-arrivals_by_gender <- arrivals_by_gender[-(9:41), ]
-colnames(arrivals_by_gender)[1] = "year"
-females <- arrivals_by_gender %>%
+by_gender <-
+	read_csv("data/arrivals_by_gender.csv", col_names = T, skip = 4)
+by_gender <- by_gender[-(9:41),]
+colnames(by_gender)[1] = "year"
+females <- by_gender %>%
 	pivot_longer(., 2:7, names_to = "visa_type", values_to = "females") %>%
 	select(., year, visa_type, females)
-males <- arrivals_by_gender %>%
+males <- by_gender %>%
 	pivot_longer(., 8:13, names_to = "visa_type", values_to = "males") %>%
 	select(., year, visa_type, males) %>%
 	mutate(., visa_type = gsub("_1", "", visa_type))
-arrivals_by_gender <- inner_join(females, males, by = c("year", "visa_type"))
+by_gender <- inner_join(females, males, by = c("year", "visa_type")) %>% 
+	pivot_longer(., c(females, males), names_to = "gender", values_to = "arrivals")
+
+by_age <-
+	read_csv("data/arrivals_by_age.csv", col_names = T, skip = 4)
+by_age <- by_age[-(9:41),]
+colnames(by_age)[1] = "year"
+age_0_4 <- by_age %>%
+	pivot_longer(., 2:7, names_to = "visa_type", values_to = "age_0_4") %>%
+	select(., year, visa_type, age_0_4)
+age_5_9 <- by_age %>%
+	pivot_longer(., 8:13, names_to = "visa_type", values_to = "age_5_9") %>%
+	select(., year, visa_type, age_5_9) %>%
+	mutate(., visa_type = gsub("_1", "", visa_type))
+age_10_14 <- by_age %>%
+	pivot_longer(., 14:19, names_to = "visa_type", values_to = "age_10_14") %>%
+	select(., year, visa_type, age_10_14) %>%
+	mutate(., visa_type = gsub("_2", "", visa_type))
+age_15_19 <- by_age %>%
+	pivot_longer(., 20:25, names_to = "visa_type", values_to = "age_15_19") %>%
+	select(., year, visa_type, age_15_19) %>%
+	mutate(., visa_type = gsub("_3", "", visa_type))
+age_20_24 <- by_age %>%
+	pivot_longer(., 26:31, names_to = "visa_type", values_to = "age_20_24") %>%
+	select(., year, visa_type, age_20_24) %>%
+	mutate(., visa_type = gsub("_4", "", visa_type))
+age_25_29 <- by_age %>%
+	pivot_longer(., 32:37, names_to = "visa_type", values_to = "age_25_29") %>%
+	select(., year, visa_type, age_25_29) %>%
+	mutate(., visa_type = gsub("_5", "", visa_type))
+age_30_34 <- by_age %>%
+	pivot_longer(., 38:43, names_to = "visa_type", values_to = "age_30_34") %>%
+	select(., year, visa_type, age_30_34) %>%
+	mutate(., visa_type = gsub("_6", "", visa_type))
+age_35_39 <- by_age %>%
+	pivot_longer(., 44:49, names_to = "visa_type", values_to = "age_35_39") %>%
+	select(., year, visa_type, age_35_39) %>%
+	mutate(., visa_type = gsub("_7", "", visa_type))
+age_40_44 <- by_age %>%
+	pivot_longer(., 50:55, names_to = "visa_type", values_to = "age_40_44") %>%
+	select(., year, visa_type, age_40_44) %>%
+	mutate(., visa_type = gsub("_8", "", visa_type))
+age_45_49 <- by_age %>%
+	pivot_longer(., 56:61, names_to = "visa_type", values_to = "age_45_49") %>%
+	select(., year, visa_type, age_45_49) %>%
+	mutate(., visa_type = gsub("_9", "", visa_type))
+age_50_54 <- by_age %>%
+	pivot_longer(., 62:67, names_to = "visa_type", values_to = "age_50_54") %>%
+	select(., year, visa_type, age_50_54) %>%
+	mutate(., visa_type = gsub("_10", "", visa_type))
+age_55_59 <- by_age %>%
+	pivot_longer(., 68:73, names_to = "visa_type", values_to = "age_55_59") %>%
+	select(., year, visa_type, age_55_59) %>%
+	mutate(., visa_type = gsub("_11", "", visa_type))
+age_60_64 <- by_age %>%
+	pivot_longer(., 74:79, names_to = "visa_type", values_to = "age_60_64") %>%
+	select(., year, visa_type, age_60_64) %>%
+	mutate(., visa_type = gsub("_12", "", visa_type))
+age_65_69 <- by_age %>%
+	pivot_longer(., 80:85, names_to = "visa_type", values_to = "age_65_69") %>%
+	select(., year, visa_type, age_65_69) %>%
+	mutate(., visa_type = gsub("_13", "", visa_type))
+age_70_74 <- by_age %>%
+	pivot_longer(., 86:91, names_to = "visa_type", values_to = "age_70_74") %>%
+	select(., year, visa_type, age_70_74) %>%
+	mutate(., visa_type = gsub("_14", "", visa_type))
+age_75_up <- by_age %>%
+	pivot_longer(., 92:97, names_to = "visa_type", values_to = "age_75_up") %>%
+	select(., year, visa_type, age_75_up) %>%
+	mutate(., visa_type = gsub("_15", "", visa_type))
+by_age <-
+	inner_join(age_0_4, age_5_9, by = c("year", "visa_type")) %>%
+	inner_join(age_10_14, age_15_19, by = c("year", "visa_type")) %>%
+	inner_join(age_20_24, age_25_29, by = c("year", "visa_type")) %>%
+	inner_join(age_30_34, age_35_39, by = c("year", "visa_type")) %>%
+	inner_join(age_40_44, age_45_49, by = c("year", "visa_type")) %>%
+	inner_join(age_50_54, age_55_59, by = c("year", "visa_type")) %>%
+	inner_join(age_60_64, age_65_69, by = c("year", "visa_type")) %>%
+	inner_join(age_70_74, age_75_up, by = c("year", "visa_type"))
+
+
+# by_age <- by_age %>% 
+# 	pivot_longer(., c(
+# 		age_0_4, age_5_9, age_10_14, age_15_19,
+# 		age_20_24, age_25_29, age_30_34, age_35_39,
+# 		age_40_44, age_45_49, age_50_54, age_55_59,
+# 		age_60_64, age_65_69, age_70_74, age_75_up
+# 		),
+# 		names_to = "age",
+# 		values_to = "arrivals"
+# 	)
+
 
 ```
 
@@ -109,3 +198,15 @@ major_occup %>%
 
 #### Conclusion: Exploring Net Permanent and Long-Term Migration by Occupation
 - Most permanent and long-term migrants are Professionals by far, while more Sales Workers and Machinery Operators and Drivers have departed New Zealand than have arrived.
+
+```{r by_gender, echo = F}
+
+ggplot(by_gender, aes(x = arrivals, y = visa_type, fill = gender)) +
+	geom_col(position = "dodge") +
+	facet_wrap(. ~ year) # SLIDER MENU FOR R SHINY?
+
+ggplot(by_gender, aes(x = year, y = arrivals, fill = gender)) +
+	geom_col(position = "dodge")
+
+```
+
