@@ -1,0 +1,39 @@
+---
+title: "Shiny Project: NZ Migration"
+author: "Sita Thomas"
+date: "4/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(readr)
+library(dplyr)
+library(tidyr)
+
+```
+
+## Data Preparation
+
+Data can be downloaded at: http://archive.stats.govt.nz/infoshare/
+Subject Categories > Tourism > International Travel and Migration
+
+```{r preprocessing}
+
+raw <- read_csv("data/ITM359302_20200428_125710_33.csv", col_names = T, skip = 3)
+View(raw)
+
+data <- separate(raw, X1, c("year", "quarter"), sep = "Q")
+	
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
