@@ -25,26 +25,36 @@ Subject Categories > Tourism > International Travel and Migration
 
 ```{r preprocessing, include=F}
 
-raw <- read_csv("data/ITM359302_20200428_125710_33.csv", col_names = T, skip = 3)
+major_occup <- read_csv("data/major_occupations.csv", col_names = T, skip = 3)
+major_occup <- major_occup[-(9:44),]
+colnames(major_occup)[1] = "year"
+colnames(major_occup) <- gsub("and", "", colnames(major_occup))
+colnames(major_occup) <- gsub(" ", "_", colnames(major_occup))
+colnames(major_occup) <- tolower(colnames(major_occup))
+colnames(major_occup)[13] = "total_occupations"
 
-colnames(raw)[1] = "year"
-	
-data <- 
-	separate(raw, year, c("year", "quarter"), sep = "Q") %>% 
-	.[-c(33:68),]
+arrivals_by_gender <-
+	read_csv("data/arrivals_by_gender.csv",
+		col_names = T,
+		skip = 4)
+arrivals_by_gender <- arrivals_by_gender[-(9:41), ]
+colnames(arrivals_by_gender)[1] = "year"
+females <- arrivals_by_gender %>%
+	pivot_longer(., 2:7, names_to = "visa_type", values_to = "females") %>%
+	select(., year, visa_type, females)
+males <- arrivals_by_gender %>%
+	pivot_longer(., 8:13, names_to = "visa_type", values_to = "males") %>%
+	select(., year, visa_type, males) %>%
+	mutate(., visa_type = gsub("_1", "", visa_type))
+arrivals_by_gender <- inner_join(females, males, by = c("year", "visa_type"))
 
-colnames(data) <-	gsub("and", "", colnames(data))
-colnames(data) <-	gsub(" ", "_", colnames(data))
-colnames(data) <- tolower(colnames(data))
-colnames(data)[14] <- "total_occupations"
-	
 ```
 
 ## Exploring Net Permanent and Long-Term Migration by Year
 
 ```{r by_year, echo = F}
 
-data %>% 
+major_occup %>% 
 	group_by(year) %>% 
 	summarise(., total = sum(total_occupations)) %>% 
 	ggplot(., aes(x = year, y = total)) +
@@ -61,31 +71,11 @@ data %>%
 #### Conclusion: Exploring Net Permanent and Long-Term Migration by Year
 - Although fairly level in 2016 and 2017, permanent and long-term migration to New Zealand for workers in the ANZSCO Major Occupation groups has increased throughout the 2010s.
 
-## Exploring Net Permanent and Long-Term Migration by Quarter
-
-```{r by_quarter, echo = F}
-
-data %>% 
-	group_by(quarter) %>% 
-	summarise(., total = sum(total_occupations)) %>% 
-	ggplot(., aes(x = quarter, y = total)) +
-		geom_col(fill = "sienna3", width = .5) +
-		labs(
-			title = "Net Permanent and Long-Term Migration to New Zealand by Quarter",
-			subtitle = "ANZSCO Major Occupations, 2010 - 2017",
-			x = "Quarter", y = "All Major ANZSCO Occupations") +
-		theme_few()
-```
-
-
-#### Conclusion: Exploring Net Permanent and Long-Term Migration by Quarter
-- Few migrants travel to New Zealand April - June (likely because it is winter in the southern hemisphere), but migration is relatively steady throughout most of the year.
-
 ## Exploring Net Migration by Occupation
 
 ```{r by_occupation, echo = F}
 
-data_spread <- data %>% 
+major_occup %>% 
 	pivot_longer(.,
 		cols = managers:labourers,
 		names_to = "occupation",
@@ -113,8 +103,6 @@ data_spread <- data %>%
 				"clerical__administrative_workers" = "Clerical and Administrative Workers"
 			)
 		)
-
-data_spread
 
 ```
 
