@@ -33,19 +33,24 @@ colnames(major_occup) <- gsub(" ", "_", colnames(major_occup))
 colnames(major_occup) <- tolower(colnames(major_occup))
 colnames(major_occup)[13] = "total_occupations"
 
-by_gender <-
-	read_csv("data/arrivals_by_gender.csv", col_names = T, skip = 4)
-by_gender <- by_gender[-(9:41),]
-colnames(by_gender)[1] = "year"
-females <- by_gender %>%
+by_visa_gender <-
+	read_csv("data/arrivals_by_visa_gender.csv", col_names = T, skip = 4)
+by_visa_gender <- by_visa_gender[-(9:41),]
+colnames(by_visa_gender)[1] = "year"
+females <- by_visa_gender %>%
 	pivot_longer(., 2:7, names_to = "visa_type", values_to = "females") %>%
 	select(., year, visa_type, females)
-males <- by_gender %>%
+males <- by_visa_gender %>%
 	pivot_longer(., 8:13, names_to = "visa_type", values_to = "males") %>%
 	select(., year, visa_type, males) %>%
 	mutate(., visa_type = gsub("_1", "", visa_type))
-by_gender <- inner_join(females, males, by = c("year", "visa_type")) %>% 
-	pivot_longer(., c(females, males), names_to = "gender", values_to = "arrivals")
+by_visa_gender <- inner_join(females, males, by = c("year", "visa_type")) %>% 
+	pivot_longer(., 3:4, names_to = "gender", values_to = "arrivals")
+
+```
+
+# Age data, not fully functional.
+```{r arrivals_by_age, include = F}
 
 by_age <-
 	read_csv("data/arrivals_by_age.csv", col_names = T, skip = 4)
@@ -136,8 +141,8 @@ by_age <-
 # 		values_to = "arrivals"
 # 	)
 
-
 ```
+
 
 ## Exploring Net Permanent and Long-Term Migration by Year
 
@@ -199,14 +204,29 @@ major_occup %>%
 #### Conclusion: Exploring Net Permanent and Long-Term Migration by Occupation
 - Most permanent and long-term migrants are Professionals by far, while more Sales Workers and Machinery Operators and Drivers have departed New Zealand than have arrived.
 
-```{r by_gender, echo = F}
+```{r by_visa_gender, echo = F}
 
-ggplot(by_gender, aes(x = arrivals, y = visa_type, fill = gender)) +
+ggplot(by_visa_gender, aes(x = arrivals, y = visa_type, fill = gender)) +
 	geom_col(position = "dodge") +
 	facet_wrap(. ~ year) # SLIDER MENU FOR R SHINY?
 
-ggplot(by_gender, aes(x = year, y = arrivals, fill = gender)) +
+ggplot(by_visa_gender, aes(x = year, y = arrivals, fill = gender)) +
 	geom_col(position = "dodge")
+
+by_visa_gender %>% 
+	group_by(., year, visa_type) %>% 
+	summarise(., total = sum(arrivals)) %>% 
+	ggplot(data = ., aes(x = year, y = total, fill = visa_type)) +
+		geom_col() +
+		labs(
+			title = "Net Permanent and Long-Term Migration to New Zealand by Type of Visa",
+			subtitle = "2010 - 2017",
+			x = "Year", y = "Arrivals",
+			fill = "Type of Visa"
+		) +
+	scale_y_continuous(labels = comma) +
+	scale_fill_brewer(palette = "Set3")+
+	theme_few()
 
 ```
 
