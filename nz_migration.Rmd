@@ -158,9 +158,9 @@ by_age <-
 ```
 
 ## Exploring Net Permanent and Long-Term Migration by Year
-```{r by_year, echo = F}
+```{r occup_by_year, echo = F}
 
-major_occup %>% 
+occup_by_year <- major_occup %>% 
 	group_by(year) %>% 
 	summarise(., total = sum(total_occupations)) %>% 
 	ggplot(., aes(x = year, y = total)) +
@@ -168,8 +168,10 @@ major_occup %>%
 		labs(
 			title = "Net Permanent and Long-Term Migration to New Zealand by Year",
 			subtitle = "ANZSCO Major Occupations, 2010 - 2017",
-			x = "Year", y = "All Major ANZSCO Occupations") +
+			x = "Year", y = "Arrivals") +
 		theme_few()
+
+occup_by_year
 
 ```
 #### Conclusion: Exploring Net Permanent and Long-Term Migration by Year
@@ -193,7 +195,7 @@ major_occup %>%
 		labs(
 			title = "Net Permanent and Long-Term Migration to New Zealand by Occupation",
 			subtitle = "ANZSCO Major Occupations, 2010 - 2017",
-			y = "Occupation", x = "All Major ANZSCO Occupations"
+			y = "Occupation", x = "Arrivals"
 			) +
 		theme_few() +
 		scale_y_discrete(
@@ -214,20 +216,52 @@ major_occup %>%
 - Most permanent and long-term migrants are Professionals by far, while more Sales Workers and Machinery Operators and Drivers have departed New Zealand than have arrived.
 
 
+
 ## Exploring Net Migration by Visa, Gender, and Age
 ```{r by_visa_gender, echo = F}
 
-ggplot(by_visa_gender, aes(x = arrivals, y = visa_type, fill = gender)) +
+# ggplot(by_visa_gender, aes(x = arrivals, y = visa_type, fill = gender)) +
+# 	geom_col(position = "dodge") +
+# 	facet_wrap(. ~ year) # SLIDER MENU FOR R SHINY?
+
+gender_by_year <- by_visa_gender %>%
+	group_by(., year, gender) %>%
+	summarise(., arrivals = sum(arrivals)) %>%
+	ggplot(data = ., aes(x = year, y = arrivals, fill = gender)) +
 	geom_col(position = "dodge") +
-	facet_wrap(. ~ year) # SLIDER MENU FOR R SHINY?
+	labs(
+		title = "Net Permanent and Long-Term Migration to New Zealand by Gender",
+		subtitle = "2010 - 2017",
+		x = "Year", y = "Arrivals",
+		fill = "Gender"
+	) +
+	scale_y_continuous(labels = comma) +
+	scale_fill_brewer(palette = "Dark2")+
+	theme_few()	
+gender_by_year
+# Conclusion - Slightly more men tend to migrate on average, which could be due to a variety of factors, such as more opportunities in male-dominated fields, greater mobility for men, and/or greater desire or self-efficacy to migrate on the part of men.
 
-ggplot(by_visa_gender, aes(x = year, y = arrivals, fill = gender)) +
-	geom_col(position = "dodge")
+gender_by_visa <- by_visa_gender %>% 
+	group_by(., gender, visa_type) %>% 
+	summarise(., arrivals = sum(arrivals)) %>% 
+	ggplot(data = ., aes(x = arrivals, y = visa_type, fill = gender)) +
+		geom_col(position = "dodge") +
+		labs(
+			title = "Net Permanent and Long-Term Migration to New Zealand by Gender and Visa Type",
+			subtitle = "2010 - 2017",
+			x = "Arrivals", y = "Type of Visa",
+			fill = "Gender"
+		) +
+		scale_x_continuous(labels = comma) +
+		scale_fill_brewer(palette = "Dark2")+
+		theme_few()	
+gender_by_visa
+# Conclusion - More men than women migrate as students and for work, which is likely due to a variety of factors, such as more opportunities in male-dominated fields, greater mobility for men, and/or greater desire or self-efficacy to migrate on the part of men. More women tend to migrate for residency and to visit, who may be the wives, daughters, and mothers of men who migrate, and may therefore be more likely to seek relationship visas rather than work or student visas.
 
-by_visa_gender %>% 
-	group_by(., year, visa_type) %>% 
-	summarise(., total = sum(arrivals)) %>% 
-	ggplot(data = ., aes(x = year, y = total, fill = visa_type)) +
+visa_by_year <- by_visa_gender %>%
+	group_by(., year, visa_type) %>%
+	summarise(., arrivals = sum(arrivals)) %>%
+	ggplot(data = ., aes(x = year, y = arrivals, fill = visa_type)) +
 		geom_col() +
 		labs(
 			title = "Net Permanent and Long-Term Migration to New Zealand by Type of Visa",
@@ -235,9 +269,17 @@ by_visa_gender %>%
 			x = "Year", y = "Arrivals",
 			fill = "Type of Visa"
 		) +
-	scale_y_continuous(labels = comma) +
-	scale_fill_brewer(palette = "Set3")+
-	theme_few()
+		scale_y_continuous(labels = comma) +
+		scale_fill_brewer(palette = "Set3")+
+		theme_few()
+visa_by_year
+# Conclusion - Aside from citizen movement, work visas make up the majority of migrant visas, with students following at a growing pace.
+```
+
+
+```{r}
+
+# PLOTS BY AGE
 
 ```
 
