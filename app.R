@@ -1,49 +1,53 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
+# GLOBAL ####
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggthemes)
+library(scales)
 library(shiny)
+library(shinydashboard)
+library(DT)
 
-# Define UI for application that draws a histogram
-ui <- fluidPage(
-
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
+# UI ####
+ui <-
+    shinyUI(
+        dashboardPage(
+            dashboardHeader(title = "Exploring Migration to New Zealand"),
+            dashboardSidebar(
+                sidebarUserPanel("Sita Thomas", image = "sita.jpg"),
+                sidebarMenu(
+                    menuItem("By Occupation", tabName = "By Occupation", icon = icon("briefcase")),
+                    menuItem("By Visa Type", tabName = "By Visa Type", icon = icon("passport"))
+                )
+            ),
+            dashboardBody(
+                tabItems(
+                    tabItem(tabName = "By Occupation", "stuff"),
+                    tabItem(tabName = "By Visa Type", "things")
+                )
+            )
         )
     )
-)
 
-# Define server logic required to draw a histogram
-server <- function(input, output) {
 
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
+# SERVER ####
+server <-
+    shinyServer(function(input, output) {
+        output$major_occup <- renderPlot(
+            major_occup %>%
+                group_by(year) %>%
+                summarise(., total = sum(total_occupations)) %>%
+                ggplot(., aes(x = year, y = total)) +
+                geom_col(fill = "sienna3") +
+                labs(
+                    title = "Net Permanent and Long-Term Migration to New Zealand by Year",
+                    subtitle = "ANZSCO Major Occupations, 2010 - 2017",
+                    x = "Year",
+                    y = "All Major ANZSCO Occupations"
+                ) +
+                theme_few()
+        )
     })
-}
 
-# Run the application 
-shinyApp(ui = ui, server = server)
+shinyApp(ui, server)

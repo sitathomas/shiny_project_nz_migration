@@ -17,7 +17,6 @@ library(scales)
 
 ```
 
-
 ## Data Information
 
 Data can be downloaded at: http://archive.stats.govt.nz/infoshare/  
@@ -48,6 +47,7 @@ by_visa_gender <- inner_join(females, males, by = c("year", "visa_type")) %>%
 	pivot_longer(., 3:4, names_to = "gender", values_to = "arrivals")
 
 ```
+
 
 # Age data, not fully functional.
 ```{r arrivals_by_age, include = F}
@@ -121,14 +121,21 @@ age_75_up <- by_age %>%
 	mutate(., visa_type = gsub("_15", "", visa_type))
 by_age <-
 	inner_join(age_0_4, age_5_9, by = c("year", "visa_type")) %>%
-	inner_join(age_10_14, age_15_19, by = c("year", "visa_type")) %>%
-	inner_join(age_20_24, age_25_29, by = c("year", "visa_type")) %>%
-	inner_join(age_30_34, age_35_39, by = c("year", "visa_type")) %>%
-	inner_join(age_40_44, age_45_49, by = c("year", "visa_type")) %>%
-	inner_join(age_50_54, age_55_59, by = c("year", "visa_type")) %>%
-	inner_join(age_60_64, age_65_69, by = c("year", "visa_type")) %>%
-	inner_join(age_70_74, age_75_up, by = c("year", "visa_type"))
-
+	inner_join(., age_10_14, by = c("year", "visa_type")) %>%
+	inner_join(., age_15_19, by = c("year", "visa_type")) %>%
+	inner_join(., age_20_24, by = c("year", "visa_type")) %>%
+	inner_join(., age_25_29, by = c("year", "visa_type")) %>%
+	inner_join(., age_30_34, by = c("year", "visa_type")) %>%
+	inner_join(., age_35_39, by = c("year", "visa_type")) %>%
+	inner_join(., age_40_44, by = c("year", "visa_type")) %>%
+	inner_join(., age_45_49, by = c("year", "visa_type")) %>%
+	inner_join(., age_50_54, by = c("year", "visa_type")) %>%
+	inner_join(., age_55_59, by = c("year", "visa_type")) %>%
+	inner_join(., age_60_64, by = c("year", "visa_type")) %>%
+	inner_join(., age_65_69, by = c("year", "visa_type")) %>%
+	inner_join(., age_70_74, by = c("year", "visa_type")) %>% 
+	inner_join(., age_75_up, by = c("year", "visa_type"))
+by_age
 
 # by_age <- by_age %>% 
 # 	pivot_longer(., c(
@@ -143,9 +150,7 @@ by_age <-
 
 ```
 
-
 ## Exploring Net Permanent and Long-Term Migration by Year
-
 ```{r by_year, echo = F}
 
 major_occup %>% 
@@ -160,13 +165,12 @@ major_occup %>%
 		theme_few()
 
 ```
-
-
 #### Conclusion: Exploring Net Permanent and Long-Term Migration by Year
 - Although fairly level in 2016 and 2017, permanent and long-term migration to New Zealand for workers in the ANZSCO Major Occupation groups has increased throughout the 2010s.
 
-## Exploring Net Migration by Occupation
 
+
+## Exploring Net Migration by Occupation
 ```{r by_occupation, echo = F}
 
 major_occup %>% 
@@ -199,11 +203,11 @@ major_occup %>%
 		)
 
 ```
-
-
 #### Conclusion: Exploring Net Permanent and Long-Term Migration by Occupation
 - Most permanent and long-term migrants are Professionals by far, while more Sales Workers and Machinery Operators and Drivers have departed New Zealand than have arrived.
 
+
+## Exploring Net Migration by Visa, Gender, and Age
 ```{r by_visa_gender, echo = F}
 
 ggplot(by_visa_gender, aes(x = arrivals, y = visa_type, fill = gender)) +
