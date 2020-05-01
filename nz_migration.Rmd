@@ -174,7 +174,14 @@ colnames(arrivals_by_area)[1] = "year"
 colnames(arrivals_by_area) <- gsub(" ", "_", colnames(arrivals_by_area))
 colnames(arrivals_by_area) <- tolower(colnames(arrivals_by_area))
 arrivals_by_area <- arrivals_by_area %>%
-	pivot_longer(., 2:85, names_to = "area", values_to = "arrivals")
+	pivot_longer(., 2:85, names_to = "area", values_to = "arrivals") %>% 
+	filter(., grepl("^chatham|region$", area), !grepl("^tasman|_territory", area)) %>% 
+	group_by(., area) %>% 
+	summarise(., arrivals = sum(arrivals))
+arrivals_by_area$fips <- c(
+	"NZE7", "NZE8", "NZE9", "NZ10", "NZF1", "NZF2", "NZF3", "NZF4",
+	"NZF5", "NZF6", "NZF7", "NZF8", "NZF9", "NZG1", "NZG2", "NZG3"
+)
 
 ```
 
@@ -432,6 +439,10 @@ arrivals_by_citizenship_plot
 map('nz')
 
 
-```
+arrivals_by_area_plot <- arrivals_by_area %>% 
+	filter(., grepl("region$", area)) %>% 
+	group_by(., area) %>% 
+	summarise(., arrivals = sum(arrivals))
+arrivals_by_area_plot
 
-help(package='maps')
+```
