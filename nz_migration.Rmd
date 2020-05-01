@@ -408,7 +408,8 @@ arrivals_by_area_plot
 nz_regions <-
 	readOGR(
 		dsn="./data/statsnzregional-council-2020-generalised-SHP",
-  	layer="regional-council-2020-generalised"
+  	layer="regional-council-2020-generalised",
+		verbose = F
 	)
 nz_regions <- nz_regions[1:16,]
 nz_regions <- spTransform(nz_regions, CRS("+proj=longlat +datum=WGS84"))
