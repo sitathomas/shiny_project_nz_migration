@@ -14,6 +14,7 @@ library(tidyr)
 library(ggplot2)
 library(ggthemes)
 library(scales)
+library(maps)
 
 ```
 
@@ -24,112 +25,116 @@ Subject Categories > Tourism > International Travel and Migration
 
 ```{r preprocessing, include=F}
 
-major_occup <- read_csv("data/major_occupations.csv", col_names = T, skip = 3)
-major_occup <- major_occup[-(9:44),]
-colnames(major_occup)[1] = "year"
-colnames(major_occup) <- gsub("and", "", colnames(major_occup))
-colnames(major_occup) <- gsub(" ", "_", colnames(major_occup))
-colnames(major_occup) <- tolower(colnames(major_occup))
-colnames(major_occup)[13] = "total_occupations"
+# occupation preprocessing ####
+arrivals_by_occup <- read_csv("data/arrivals_by_occup.csv", col_names = T, skip = 3)
+arrivals_by_occup <- arrivals_by_occup[-(9:44),]
+colnames(arrivals_by_occup)[1] = "year"
+colnames(arrivals_by_occup) <- gsub("and", "", colnames(arrivals_by_occup))
+colnames(arrivals_by_occup) <- gsub(" ", "_", colnames(arrivals_by_occup))
+colnames(arrivals_by_occup) <- tolower(colnames(arrivals_by_occup))
+colnames(arrivals_by_occup)[13] = "total_occupations"
+arrivals_by_occup
 
-by_visa_gender <-
-	read_csv("data/arrivals_by_visa_gender.csv", col_names = T, skip = 4)
-by_visa_gender <- by_visa_gender[-(9:41),]
-colnames(by_visa_gender)[1] = "year"
-females <- by_visa_gender %>%
+# gender preprocessing ####
+arrivals_by_gender <-
+	read_csv("data/arrivals_by_gender.csv", col_names = T, skip = 4)
+arrivals_by_gender <- arrivals_by_gender[-(9:41),]
+colnames(arrivals_by_gender)[1] = "year"
+females <- arrivals_by_gender %>%
 	pivot_longer(., 2:7, names_to = "visa_type", values_to = "females") %>%
 	select(., year, visa_type, females)
-males <- by_visa_gender %>%
+males <- arrivals_by_gender %>%
 	pivot_longer(., 8:13, names_to = "visa_type", values_to = "males") %>%
 	select(., year, visa_type, males) %>%
 	mutate(., visa_type = gsub("_1", "", visa_type))
-by_visa_gender <- inner_join(females, males, by = c("year", "visa_type")) %>% 
+arrivals_by_gender <- inner_join(females, males, by = c("year", "visa_type")) %>% 
 	pivot_longer(., 3:4, names_to = "gender", values_to = "arrivals")
 
-by_age <-
+# age preprocessing ####
+arrivals_by_age <-
 	read_csv("data/arrivals_by_age.csv", col_names = T, skip = 4)
-by_age <- by_age[-(9:41),]
-colnames(by_age)[1] = "year"
-age_00_04 <- by_age %>%
+arrivals_by_age <- arrivals_by_age[-(9:41),]
+colnames(arrivals_by_age)[1] = "year"
+age_00_04 <- arrivals_by_age %>%
 	pivot_longer(., 2:7, names_to = "visa_type", values_to = "age_00_04") %>%
 	select(., year, visa_type, age_00_04) %>% 
 	mutate(., age_00_04 = as.integer(age_00_04))
-age_05_09 <- by_age %>% 
+age_05_09 <- arrivals_by_age %>% 
 	pivot_longer(., 8:13, names_to = "visa_type", values_to = "age_05_09") %>%
 	select(., year, visa_type, age_05_09) %>%
 	mutate(., age_05_09 = as.integer(age_05_09),
 		visa_type = gsub("_1", "", visa_type))
-age_10_14 <- by_age %>%
+age_10_14 <- arrivals_by_age %>%
 	pivot_longer(., 14:19, names_to = "visa_type", values_to = "age_10_14") %>%
 	select(., year, visa_type, age_10_14) %>%
 	mutate(., age_10_14 = as.integer(age_10_14),
 		visa_type = gsub("_2", "", visa_type))
-age_15_19 <- by_age %>%
+age_15_19 <- arrivals_by_age %>%
 	pivot_longer(., 20:25, names_to = "visa_type", values_to = "age_15_19") %>%
 	select(., year, visa_type, age_15_19) %>%
 	mutate(., age_15_19 = as.integer(age_15_19),
 		visa_type = gsub("_3", "", visa_type))
-age_20_24 <- by_age %>%
+age_20_24 <- arrivals_by_age %>%
 	pivot_longer(., 26:31, names_to = "visa_type", values_to = "age_20_24") %>%
 	select(., year, visa_type, age_20_24) %>%
 	mutate(., age_20_24 = as.integer(age_20_24),
 		visa_type = gsub("_4", "", visa_type))
-age_25_29 <- by_age %>%
+age_25_29 <- arrivals_by_age %>%
 	pivot_longer(., 32:37, names_to = "visa_type", values_to = "age_25_29") %>%
 	select(., year, visa_type, age_25_29) %>%
 	mutate(., age_25_29 = as.integer(age_25_29),
 		visa_type = gsub("_5", "", visa_type))
-age_30_34 <- by_age %>%
+age_30_34 <- arrivals_by_age %>%
 	pivot_longer(., 38:43, names_to = "visa_type", values_to = "age_30_34") %>%
 	select(., year, visa_type, age_30_34) %>%
 	mutate(., age_30_34 = as.integer(age_30_34),
 		visa_type = gsub("_6", "", visa_type))
-age_35_39 <- by_age %>%
+age_35_39 <- arrivals_by_age %>%
 	pivot_longer(., 44:49, names_to = "visa_type", values_to = "age_35_39") %>%
 	select(., year, visa_type, age_35_39) %>%
 	mutate(., age_35_39 = as.integer(age_35_39),
 		visa_type = gsub("_7", "", visa_type))
-age_40_44 <- by_age %>%
+age_40_44 <- arrivals_by_age %>%
 	pivot_longer(., 50:55, names_to = "visa_type", values_to = "age_40_44") %>%
 	select(., year, visa_type, age_40_44) %>%
 	mutate(., age_40_44 = as.integer(age_40_44),
 		visa_type = gsub("_8", "", visa_type))
-age_45_49 <- by_age %>%
+age_45_49 <- arrivals_by_age %>%
 	pivot_longer(., 56:61, names_to = "visa_type", values_to = "age_45_49") %>%
 	select(., year, visa_type, age_45_49) %>%
 	mutate(., age_45_49 = as.integer(age_45_49),
 		visa_type = gsub("_9", "", visa_type))
-age_50_54 <- by_age %>%
+age_50_54 <- arrivals_by_age %>%
 	pivot_longer(., 62:67, names_to = "visa_type", values_to = "age_50_54") %>%
 	select(., year, visa_type, age_50_54) %>%
 	mutate(., age_50_54 = as.integer(age_50_54),
 		visa_type = gsub("_10", "", visa_type))
-age_55_59 <- by_age %>%
+age_55_59 <- arrivals_by_age %>%
 	pivot_longer(., 68:73, names_to = "visa_type", values_to = "age_55_59") %>%
 	select(., year, visa_type, age_55_59) %>%
 	mutate(., age_55_59 = as.integer(age_55_59),
 		visa_type = gsub("_11", "", visa_type))
-age_60_64 <- by_age %>%
+age_60_64 <- arrivals_by_age %>%
 	pivot_longer(., 74:79, names_to = "visa_type", values_to = "age_60_64") %>%
 	select(., year, visa_type, age_60_64) %>%
 	mutate(., age_60_64 = as.integer(age_60_64),
 		visa_type = gsub("_12", "", visa_type))
-age_65_69 <- by_age %>%
+age_65_69 <- arrivals_by_age %>%
 	pivot_longer(., 80:85, names_to = "visa_type", values_to = "age_65_69") %>%
 	select(., year, visa_type, age_65_69) %>%
 	mutate(., age_65_69 = as.integer(age_65_69),
 		visa_type = gsub("_13", "", visa_type))
-age_70_74 <- by_age %>%
+age_70_74 <- arrivals_by_age %>%
 	pivot_longer(., 86:91, names_to = "visa_type", values_to = "age_70_74") %>%
 	select(., year, visa_type, age_70_74) %>%
 	mutate(., age_70_74 = as.integer(age_70_74),
 		visa_type = gsub("_14", "", visa_type))
-age_75_up <- by_age %>%
+age_75_up <- arrivals_by_age %>%
 	pivot_longer(., 92:97, names_to = "visa_type", values_to = "age_75_up") %>%
 	select(., year, visa_type, age_75_up) %>%
 	mutate(., age_75_up = as.integer(age_75_up),
 		visa_type = gsub("_15", "", visa_type))
-by_age <-
+arrivals_by_age <-
 	inner_join(age_00_04, age_05_09, by = c("year", "visa_type")) %>%
 	inner_join(., age_10_14, by = c("year", "visa_type")) %>%
 	inner_join(., age_15_19, by = c("year", "visa_type")) %>%
@@ -155,23 +160,40 @@ by_age <-
 		values_to = "arrivals"
 	)
 
+# citizenship preprocessing ####
+arrivals_by_citizenship <- read_csv("data/arrivals_by_citizenship.csv", col_names = T)
+colnames(arrivals_by_citizenship) <- gsub(" ", "_", colnames(arrivals_by_citizenship))
+colnames(arrivals_by_citizenship) <- tolower(colnames(arrivals_by_citizenship))
+arrivals_by_citizenship <- arrivals_by_citizenship %>% 
+	pivot_longer(., 2:14, names_to = "citizenship", values_to = "arrivals")
+
+# area preprocessing ####
+arrivals_by_area <- read_csv("data/arrivals_by_area.csv", col_names = T, skip = 4)
+arrivals_by_area <- arrivals_by_area[-(9:49),]
+colnames(arrivals_by_area)[1] = "year"
+colnames(arrivals_by_area) <- gsub(" ", "_", colnames(arrivals_by_area))
+colnames(arrivals_by_area) <- tolower(colnames(arrivals_by_area))
+arrivals_by_area <- arrivals_by_area %>%
+	pivot_longer(., 2:85, names_to = "area", values_to = "arrivals")
+
 ```
 
 ## Exploring Net Permanent and Long-Term Migration by Year
-```{r occup_by_year, echo = F}
+```{r workers_by_year, echo = F}
 
-occup_by_year <- major_occup %>% 
+workers_by_year <- arrivals_by_occup %>% 
 	group_by(year) %>% 
 	summarise(., total = sum(total_occupations)) %>% 
 	ggplot(., aes(x = year, y = total)) +
 		geom_col(fill = "sienna3") +
 		labs(
-			title = "Net Permanent and Long-Term Migration to New Zealand by Year",
-			subtitle = "ANZSCO Major Occupations, 2010 - 2017",
+			title = "Workers by Year: ANZSCO Major Occupations Only",
+			subtitle = "Net Permanent and Long-Term Migration to New Zealand, 2010 - 2017",
 			x = "Year", y = "Arrivals") +
-		theme_few()
+		theme_few() +
+		scale_y_continuous(labels = comma)
 
-occup_by_year
+workers_by_year
 
 ```
 #### Conclusion: Exploring Net Permanent and Long-Term Migration by Year
@@ -180,9 +202,9 @@ occup_by_year
 
 
 ## Exploring Net Migration by Occupation
-```{r by_occupation, echo = F}
+```{r workers_by_occup, echo = F}
 
-major_occup %>% 
+workers_by_occup <- arrivals_by_occup %>% 
 	pivot_longer(.,
 		cols = managers:labourers,
 		names_to = "occupation",
@@ -193,8 +215,8 @@ major_occup %>%
 	ggplot(data = ., aes(y = occupation, x = occupation_sum)) +
 		geom_col(fill = "sienna3") +
 		labs(
-			title = "Net Permanent and Long-Term Migration to New Zealand by Occupation",
-			subtitle = "ANZSCO Major Occupations, 2010 - 2017",
+			title = "Workers by Occupation: ANZSCO Major Occupations Only",
+			subtitle = "Net Permanent and Long-Term Migration to New Zealand, 2010 - 2017",
 			y = "Occupation", x = "Arrivals"
 			) +
 		theme_few() +
@@ -210,6 +232,7 @@ major_occup %>%
 				"clerical__administrative_workers" = "Clerical and Administrative Workers"
 			)
 		)
+workers_by_occup
 
 ```
 #### Conclusion: Exploring Net Permanent and Long-Term Migration by Occupation
@@ -218,83 +241,197 @@ major_occup %>%
 
 
 ## Exploring Net Migration by Visa, Gender, and Age
-```{r by_visa_gender, echo = F}
+```{r arrivals_by_gender, echo = F}
 
-# ggplot(by_visa_gender, aes(x = arrivals, y = visa_type, fill = gender)) +
+# ggplot(arrivals_by_gender, aes(x = arrivals, y = visa_type, fill = gender)) +
 # 	geom_col(position = "dodge") +
 # 	facet_wrap(. ~ year) # SLIDER MENU FOR R SHINY?
 
-gender_by_year <- by_visa_gender %>%
+arrivals_by_gender_plot <- arrivals_by_gender %>%
 	group_by(., year, gender) %>%
 	summarise(., arrivals = sum(arrivals)) %>%
 	ggplot(data = ., aes(x = year, y = arrivals, fill = gender)) +
 	geom_col(position = "dodge") +
 	labs(
-		title = "Net Permanent and Long-Term Migration to New Zealand by Gender",
-		subtitle = "2010 - 2017",
+		title = "Arrivals by Gender",
+		subtitle = "Net Permanent and Long-Term Migration to New Zealand, 2010 - 2017",
 		x = "Year", y = "Arrivals",
 		fill = "Gender"
 	) +
 	scale_y_continuous(labels = comma) +
 	scale_fill_brewer(palette = "Dark2")+
 	theme_few()	
-gender_by_year
+arrivals_by_gender_plot
 # Conclusion - Slightly more men tend to migrate on average, which could be due to a variety of factors, such as more opportunities in male-dominated fields, greater mobility for men, and/or greater desire or self-efficacy to migrate on the part of men.
 
-gender_by_visa <- by_visa_gender %>% 
+visa_by_gender <- arrivals_by_gender %>% 
 	group_by(., gender, visa_type) %>% 
 	summarise(., arrivals = sum(arrivals)) %>% 
 	ggplot(data = ., aes(x = arrivals, y = visa_type, fill = gender)) +
 		geom_col(position = "dodge") +
 		labs(
-			title = "Net Permanent and Long-Term Migration to New Zealand by Gender and Visa Type",
-			subtitle = "2010 - 2017",
+			title = "Type of Visa by Gender",
+			subtitle = "Net Permanent and Long-Term Migration to New Zealand, 2010 - 2017",
 			x = "Arrivals", y = "Type of Visa",
 			fill = "Gender"
 		) +
 		scale_x_continuous(labels = comma) +
 		scale_fill_brewer(palette = "Dark2")+
 		theme_few()	
-gender_by_visa
+visa_by_gender
 # Conclusion - More men than women migrate as students and for work, which is likely due to a variety of factors, such as more opportunities in male-dominated fields, greater mobility for men, and/or greater desire or self-efficacy to migrate on the part of men. More women tend to migrate for residency and to visit, who may be the wives, daughters, and mothers of men who migrate, and may therefore be more likely to seek relationship visas rather than work or student visas.
 
-visa_by_year <- by_visa_gender %>%
+arrivals_by_visa <- arrivals_by_gender %>%
 	group_by(., year, visa_type) %>%
 	summarise(., arrivals = sum(arrivals)) %>%
 	ggplot(data = ., aes(x = year, y = arrivals, fill = visa_type)) +
-		geom_col() +
+		geom_col(position = "fill") +
 		labs(
-			title = "Net Permanent and Long-Term Migration to New Zealand by Type of Visa",
-			subtitle = "2010 - 2017",
+			title = "Arrivals by Visa",
+			subtitle = "Net Permanent and Long-Term Migration to New Zealand, 2010 - 2017",
 			x = "Year", y = "Arrivals",
 			fill = "Type of Visa"
 		) +
-		scale_y_continuous(labels = comma) +
+		scale_y_continuous(labels = percent) +
 		scale_fill_brewer(palette = "Set3")+
 		theme_few()
-visa_by_year
-# Conclusion - Aside from citizen movement, work visas make up the majority of migrant visas, with students following at a growing pace.
+arrivals_by_visa
+# Conclusion - Work Visas and citizens returning to the country or moving from Australia make up the majority of arrivals.
+
 ```
 
+```{r arrivals_by_age, echo = F}
 
-```{r by_age, echo = F}
-
-age_by_year <- by_age %>%
+age_by_year <- arrivals_by_age %>%
 	group_by(., year, age) %>%
 	summarise(., arrivals = sum(arrivals)) %>%
 	ggplot(data = ., aes(x = arrivals, y = age)) +
 		geom_col(fill = "sienna3") +
 		labs(
-			title = "Net Permanent and Long-Term Migration to New Zealand by Age",
-			subtitle = "2010 - 2017",
-			x = "Arrivals", y = "Age"
+			title = "Arrivals by Age",
+			subtitle = "Net Permanent and Long-Term Migration to New Zealand, 2010 - 2017",
+			x = "Arrivals", y = "Ages"
 		) +
 	scale_x_continuous(labels = comma) +
+	scale_y_discrete(
+		labels = c(
+			"age_00_04" = "0 to 4",
+			"age_05_09" = "5 to 9",
+			"age_10_14" = "10 to 14",
+			"age_15_19" = "15 to 19",
+			"age_20_24" = "20 to 24",
+			"age_25_29" = "25 to 29",
+			"age_30_34" = "30 to 34",
+			"age_35_39" = "35 to 39",
+			"age_40_44" = "40 to 44",
+			"age_45_49" = "45 to 49",
+			"age_50_54" = "50 to 54",
+			"age_55_59" = "55 to 59",
+			"age_60_64" = "60 to 64",
+			"age_65_69" = "65 to 69",
+			"age_70_74" = "70 to 74",
+			"age_75_up" = "75 and up"
+		)
+	) +
 	theme_few()
 age_by_year
+# Conclusion - most arrivals are students and young professionals, and likely citizens returning after college education elsewhere.
 
 
+age_by_visa <- arrivals_by_age %>%
+	group_by(., visa_type, age) %>%
+	summarise(., arrivals = sum(arrivals)) %>%
+	ggplot(data = ., aes(x = arrivals, y = age, fill = visa_type)) +
+		geom_col(position = "fill") +
+		labs(
+			title = "Age by Type of Visa",
+			subtitle = "Net Permanent and Long-Term Migration to New Zealand, 2010 - 2017",
+			x = "Arrivals", y = "Ages"
+		) +
+	scale_x_continuous(labels = percent) +
+	scale_y_discrete(
+		labels = c(
+			"age_00_04" = "0 to 4",
+			"age_05_09" = "5 to 9",
+			"age_10_14" = "10 to 14",
+			"age_15_19" = "15 to 19",
+			"age_20_24" = "20 to 24",
+			"age_25_29" = "25 to 29",
+			"age_30_34" = "30 to 34",
+			"age_35_39" = "35 to 39",
+			"age_40_44" = "40 to 44",
+			"age_45_49" = "45 to 49",
+			"age_50_54" = "50 to 54",
+			"age_55_59" = "55 to 59",
+			"age_60_64" = "60 to 64",
+			"age_65_69" = "65 to 69",
+			"age_70_74" = "70 to 74",
+			"age_75_up" = "75 and up"
+		)
+	) +
+	theme_few()
+age_by_visa
+# Conclusion - As to be expected, the type of visa largely correlates with standard life cycles - the young are students, young adults are workers, and seniors are likely retirees. Citizens returning to New Zealand peak in their 50s, possibly returning as empty-nesters after children become independent, or to care for aging parents.
+
+```
+
+```{r arrivals_by_citizenship, echo = F}
+
+arrivals_by_citizenship_plot <- arrivals_by_citizenship %>% 
+	group_by(., year, citizenship) %>% 
+	summarise(., arrivals = sum(arrivals)) %>% 
+	ggplot(data = ., aes(x = year, y = arrivals, fill = citizenship)) +
+	geom_col(position = "fill") +
+	labs(
+		title = "Arrivals by Citizenship",
+		subtitle = "Net Permanent and Long-Term Migration to New Zealand, 2010 - 2017",
+		x = "Year", y = "Arrivals",
+		fill = "Citizenship"
+	) +
+	scale_fill_manual(
+		labels = c(
+			"new_zealand" = "New Zealand",
+			"australia" = "Australia",
+			"fiji" = "Fiji",
+			"china,_people's_republic_of" = "China",
+			"india" = "India",
+			"japan" = "Japan",
+			"korea,_republic_of" = "South Korea",
+			"philippines" = "The Philippines",
+			"germany" = "Germany",
+			"united_kingdom" = "The UK",
+			"canada" = "Canada",
+			"united_states_of_america" = "The US",
+			"south_africa" = "South Africa"
+		),
+		values = c(
+			"australia" = "saddlebrown",
+			"canada" = "yellow3",
+			"china,_people's_republic_of" = "royalblue4",
+			"fiji" = "coral2",
+			"germany" = "yellowgreen",
+			"india" = "darkorchid4",
+			"japan" = "orange",
+			"korea,_republic_of" = "green4",
+			"new_zealand" = "lightgoldenrod3",			
+			"philippines" = "hotpink3",
+			"south_africa" = "aquamarine3",
+			"united_kingdom" = "darkolivegreen",
+			"united_states_of_america" = "red4"
+		)
+	) +
+	scale_y_continuous(labels = percent) +
+	theme_few()
+arrivals_by_citizenship_plot
+# Conclusion - Most arrivals are returning citizens, followed by people from the UK, India, and China. Aside from a small surge in migrants from India in 2014 and 2015, as well as recently growing numbers from the Philippines and South Africa, numbers from most countries don't fluctate dramatically. 
+
+```
+
+```{r arrivals_by_area, echo = F}
+
+map('nz')
 
 
 ```
 
+help(package='maps')
