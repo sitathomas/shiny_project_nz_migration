@@ -438,12 +438,15 @@ arrivals_by_citizenship_plot
 
 ```{r arrivals_by_area, echo = F}
 
-nz_regions <- readOGR(
-	dsn="./data/statsnzregional-council-2020-generalised-SHP", 
-  layer="regional-council-2020-generalised",
-	verbose = F
+nz_regions <-
+	readOGR(
+		dsn="./data/statsnzregional-council-2020-generalised-SHP", 
+  	layer="regional-council-2020-generalised"
 	)
+nz_regions <- spTransform(nz_regions, CRS("+proj=longlat +datum=WGS84"))
 
-plot(nz_regions)
+leaflet() %>% 
+	addTiles() %>% 
+	addPolygons(data = nz_regions)
 
 ```
