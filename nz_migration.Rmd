@@ -15,6 +15,8 @@ library(ggplot2)
 library(ggthemes)
 library(scales)
 library(maps)
+library(leaflet)
+library(rgdal)
 
 ```
 
@@ -436,13 +438,12 @@ arrivals_by_citizenship_plot
 
 ```{r arrivals_by_area, echo = F}
 
-map('nz')
+nz_regions <- readOGR(
+	dsn="./data/statsnzregional-council-2020-generalised-SHP", 
+  layer="regional-council-2020-generalised",
+	verbose = F
+	)
 
-
-arrivals_by_area_plot <- arrivals_by_area %>% 
-	filter(., grepl("region$", area)) %>% 
-	group_by(., area) %>% 
-	summarise(., arrivals = sum(arrivals))
-arrivals_by_area_plot
+plot(nz_regions)
 
 ```
