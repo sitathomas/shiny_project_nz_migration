@@ -14,7 +14,6 @@ library(tidyr)
 library(ggplot2)
 library(ggthemes)
 library(scales)
-library(maps)
 library(leaflet)
 library(rgdal)
 
@@ -443,10 +442,14 @@ nz_regions <-
 		dsn="./data/statsnzregional-council-2020-generalised-SHP", 
   	layer="regional-council-2020-generalised"
 	)
+nz_regions <- nz_regions[1:15,]
 nz_regions <- spTransform(nz_regions, CRS("+proj=longlat +datum=WGS84"))
 
 leaflet() %>% 
 	addTiles() %>% 
-	addPolygons(data = nz_regions)
+	addPolygons(
+		data = nz_regions,
+		fillColor = rainbow(16),
+		stroke = F)
 
 ```
