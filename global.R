@@ -5,20 +5,19 @@ library(tidyr)
 library(ggplot2)
 library(ggthemes)
 library(scales)
+library(rgdal)
+library(leaflet)
 library(shiny)
 library(shinydashboard)
 
-# Arrivals by Occupation ####
+# occupation preprocessing ####
 arrivals_by_occup <- read_csv("data/arrivals_by_occup.csv", col_names = T, skip = 3)
 arrivals_by_occup <- arrivals_by_occup[-(9:44),]
 colnames(arrivals_by_occup)[1] = "year"
-colnames(arrivals_by_occup) <- gsub("and", "", colnames(arrivals_by_occup))
-colnames(arrivals_by_occup) <- gsub(" ", "_", colnames(arrivals_by_occup))
-colnames(arrivals_by_occup) <- tolower(colnames(arrivals_by_occup))
-colnames(arrivals_by_occup)[13] = "total_occupations"
+colnames(arrivals_by_occup)[13] = "total_occup"
 arrivals_by_occup
 
-# Arrivals By Gender ####
+# gender preprocessing ####
 arrivals_by_gender <-
 	read_csv("data/arrivals_by_gender.csv", col_names = T, skip = 4)
 arrivals_by_gender <- arrivals_by_gender[-(9:41),]
@@ -33,7 +32,7 @@ males <- arrivals_by_gender %>%
 arrivals_by_gender <- inner_join(females, males, by = c("year", "visa_type")) %>%
 	pivot_longer(., 3:4, names_to = "gender", values_to = "arrivals")
 
-# Arrivals By Age ####
+# age preprocessing ####
 arrivals_by_age <-
 	read_csv("data/arrivals_by_age.csv", col_names = T, skip = 4)
 arrivals_by_age <- arrivals_by_age[-(9:41),]
@@ -142,3 +141,36 @@ arrivals_by_age <-
 		names_to = "age",
 		values_to = "arrivals"
 	)
+
+ages <- c(
+			"age_00_04" = "0 to 4", "age_05_09" = "5 to 9",
+			"age_10_14" = "10 to 14", "age_15_19" = "15 to 19",
+			"age_20_24" = "20 to 24", "age_25_29" = "25 to 29",
+			"age_30_34" = "30 to 34", "age_35_39" = "35 to 39",
+			"age_40_44" = "40 to 44", "age_45_49" = "45 to 49",
+			"age_50_54" = "50 to 54", "age_55_59" = "55 to 59",
+			"age_60_64" = "60 to 64", "age_65_69" = "65 to 69",
+			"age_70_74" = "70 to 74", "age_75_up" = "75 and up"
+		)
+
+# citizenship preprocessing ####
+arrivals_by_citizenship <- read_csv("data/arrivals_by_citizenship.csv", col_names = T)
+colnames(arrivals_by_citizenship) <- gsub(" ", "_", colnames(arrivals_by_citizenship))
+colnames(arrivals_by_citizenship) <- tolower(colnames(arrivals_by_citizenship))
+arrivals_by_citizenship <- arrivals_by_citizenship %>%
+	pivot_longer(., 2:14, names_to = "citizenship", values_to = "arrivals")
+
+# area preprocessing ####
+arrivals_by_area <- read_csv("data/arrivals_by_area.csv", col_names = T, skip = 4)
+arrivals_by_area <- arrivals_by_area[-(9:49),]
+colnames(arrivals_by_area)[1] = "year"
+colnames(arrivals_by_area) <- gsub("region", "Region", colnames(arrivals_by_area))
+arrivals_by_area <- arrivals_by_area %>%
+	pivot_longer(., 2:17, names_to = "area", values_to = "arrivals") %>%
+	group_by(., year, area) %>%
+	summarise(., arrivals = sum(arrivals))
+
+# ggplot preprocessing ####
+subtitle <- "Net Permanent and Long-Term Migration to New Zealand, 2010 - 2017"
+x_commas <- scale_x_continuous(labels = comma)
+y_commas <- scale_y_continuous(labels = comma)
