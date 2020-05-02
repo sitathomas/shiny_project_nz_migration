@@ -17,6 +17,7 @@ library(ggthemes)
 library(scales)
 library(rgdal)
 library(leaflet)
+# library(DT) # used in Shiny app
 
 ```
 
@@ -31,7 +32,7 @@ Subject Categories > Tourism > International Travel and Migration
 arrivals_by_occup <- read_csv("data/arrivals_by_occup.csv", col_names = T, skip = 3)
 arrivals_by_occup <- arrivals_by_occup[-(9:44),]
 colnames(arrivals_by_occup)[1] = "year"
-colnames(arrivals_by_occup)[13] = "total_occup"
+colnames(arrivals_by_occup)[10] = "total_occup"
 arrivals_by_occup
 
 # gender preprocessing ####
@@ -189,7 +190,7 @@ arrivals_by_area <- arrivals_by_area %>%
 	summarise(., arrivals = sum(arrivals))
 
 # ggplot preprocessing ####
-subtitle <- "Net Permanent and Long-Term Migration to New Zealand, 2010 - 2017"
+subtitle <- "Permanent and Long-Term Migration to New Zealand, 2010 - 2017"
 x_commas <- scale_x_continuous(labels = comma)
 y_commas <- scale_y_continuous(labels = comma)
 
@@ -220,7 +221,7 @@ workers_by_year
 
 workers_by_occup <- arrivals_by_occup %>% 
 	pivot_longer(.,
-		cols = 2:12,
+		cols = 2:10,
 		names_to = "occupation",
 		values_to = "arrivals"
 	) %>% 
@@ -241,10 +242,6 @@ workers_by_occup
 ```
 
 ```{r arrivals_by_gender, echo = F}
-
-ggplot(arrivals_by_gender, aes(x = arrivals, y = visa_type, fill = gender)) +
-	geom_col(position = "dodge") +
-	facet_wrap(. ~ year) # SLIDER MENU FOR R SHINY?
 
 arrivals_by_gender_plot <- arrivals_by_gender %>%
 	group_by(., year, gender) %>%
@@ -278,7 +275,7 @@ visa_by_gender <- arrivals_by_gender %>%
 		scale_fill_brewer(palette = "Dark2")+
 		theme_few()	
 visa_by_gender
-# Conclusion - More men than women migrate as students and for work, which is likely due to a variety of factors, such as more opportunities in male-dominated fields, greater mobility for men, and/or greater desire or self-efficacy to migrate on the part of men. More women tend to migrate for residency and to visit, who may be the wives, daughters, and mothers of men who migrate, and may therefore be more likely to seek relationship visas rather than work or student visas.
+# Conclusion - More men than women migrate as students and for work, which is likely due to the same variety of factors that includes those listed above. More women tend to migrate for residency and to visit. These women may be spirited adventurers, but possibly tend be the wives, daughters, and mothers of men who migrate, and may therefore be more likely to seek visas based on their relationships rather than work or student visas.
 
 arrivals_by_visa <- arrivals_by_gender %>%
 	group_by(., year, visa_type) %>%
@@ -421,5 +418,5 @@ leaflet() %>%
 		fillColor = rainbow(16),
 		stroke = F
 	)
-
+# Conclusion - The vast majority of migrants land in the Auckland area, followed by Canturbury and Wellington.
 ```

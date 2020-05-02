@@ -1,4 +1,4 @@
-# Libraries ####
+# libraries ####
 library(readr)
 library(dplyr)
 library(tidyr)
@@ -9,12 +9,13 @@ library(rgdal)
 library(leaflet)
 library(shiny)
 library(shinydashboard)
+library(DT)
 
 # occupation preprocessing ####
 arrivals_by_occup <- read_csv("data/arrivals_by_occup.csv", col_names = T, skip = 3)
 arrivals_by_occup <- arrivals_by_occup[-(9:44),]
 colnames(arrivals_by_occup)[1] = "year"
-colnames(arrivals_by_occup)[13] = "total_occup"
+colnames(arrivals_by_occup)[10] = "total_occup"
 arrivals_by_occup
 
 # gender preprocessing ####
@@ -174,3 +175,13 @@ arrivals_by_area <- arrivals_by_area %>%
 subtitle <- "Net Permanent and Long-Term Migration to New Zealand, 2010 - 2017"
 x_commas <- scale_x_continuous(labels = comma)
 y_commas <- scale_y_continuous(labels = comma)
+
+# nz_regions preprocessing ####
+nz_regions <-
+	readOGR(
+		dsn="./data/statsnzregional-council-2020-generalised-SHP",
+  	layer="regional-council-2020-generalised",
+		verbose = F
+	)
+nz_regions <- nz_regions[1:16,]
+nz_regions <- spTransform(nz_regions, CRS("+proj=longlat +datum=WGS84"))
