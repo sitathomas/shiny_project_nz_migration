@@ -14,6 +14,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(ggthemes)
+library(RColorBrewer)
 library(scales)
 library(rgdal)
 library(leaflet)
@@ -221,12 +222,12 @@ workers_by_year
 
 workers_by_occup <- arrivals_by_occup %>% 
 	pivot_longer(.,
-		cols = 2:10,
+		cols = 2:9,
 		names_to = "occupation",
 		values_to = "arrivals"
-	) %>% 
-	group_by(., occupation) %>% 
-	summarise(., arrivals = sum(arrivals)) %>% 
+	) %>%
+	group_by(., occupation) %>%
+	summarise(., arrivals = sum(arrivals)) %>%
 	ggplot(data = ., aes(y = occupation, x = arrivals)) +
 		geom_col(fill = "#d95f02") +
 		labs(
@@ -259,6 +260,9 @@ arrivals_by_gender_plot <- arrivals_by_gender %>%
 		theme_few()	
 arrivals_by_gender_plot
 # Conclusion - Slightly more men tend to migrate on average, which could be due to a variety of factors, such as more opportunities in male-dominated fields, greater mobility for men, and/or greater desire or self-efficacy to migrate on the part of men.
+```
+
+```{r visas_by_gender, echo = F}
 
 visa_by_gender <- arrivals_by_gender %>% 
 	group_by(., gender, visa_type) %>% 
@@ -276,6 +280,9 @@ visa_by_gender <- arrivals_by_gender %>%
 		theme_few()	
 visa_by_gender
 # Conclusion - More men than women migrate as students and for work, which is likely due to the same variety of factors that includes those listed above. More women tend to migrate for residency and to visit. These women may be spirited adventurers, but possibly tend be the wives, daughters, and mothers of men who migrate, and may therefore be more likely to seek visas based on their relationships rather than work or student visas.
+```
+
+```{r arrivals_by_visa, echo = F}
 
 arrivals_by_visa <- arrivals_by_gender %>%
 	group_by(., year, visa_type) %>%
@@ -362,21 +369,7 @@ arrivals_by_citizenship_plot <- arrivals_by_citizenship %>%
 			"united_states_of_america" = "The US",
 			"south_africa" = "South Africa"
 		),
-		values = c(
-			"australia" = "saddlebrown",
-			"canada" = "yellow3",
-			"china,_people's_republic_of" = "royalblue4",
-			"fiji" = "coral2",
-			"germany" = "yellowgreen",
-			"india" = "darkorchid4",
-			"japan" = "orange",
-			"korea,_republic_of" = "green4",
-			"new_zealand" = "lightgoldenrod3",			
-			"philippines" = "hotpink3",
-			"south_africa" = "aquamarine3",
-			"united_kingdom" = "darkolivegreen",
-			"united_states_of_america" = "red4"
-		)
+		values = colorRampPalette(brewer.pal(12, "Set3"))(13)
 	) +
 	scale_y_continuous(labels = percent) +
 	theme_few()

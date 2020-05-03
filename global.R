@@ -4,6 +4,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(ggthemes)
+library(RColorBrewer)
 library(scales)
 library(rgdal)
 library(leaflet)
@@ -172,7 +173,7 @@ arrivals_by_area <- arrivals_by_area %>%
 	summarise(., arrivals = sum(arrivals))
 
 # ggplot preprocessing ####
-subtitle <- "Net Permanent and Long-Term Migration to New Zealand, 2010 - 2017"
+subtitle <- "Permanent and Long-Term Migration to New Zealand, 2010 - 2017"
 x_commas <- scale_x_continuous(labels = comma)
 y_commas <- scale_y_continuous(labels = comma)
 
