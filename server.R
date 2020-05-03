@@ -51,7 +51,26 @@ shinyServer(function(input, output) {
 			scale_fill_brewer(palette = "Set3") +
 			theme_few()
 	)
-
+	select_visa_by_age <- reactive(
+		arrivals_by_age %>%
+			filter(., visa_type == input$visa_type) %>%
+			group_by(., visa_type, age) %>%
+			summarise(., arrivals = sum(arrivals))
+	)
+	output$select_visa_by_age <- renderPlot(
+		select_visa_by_age() %>%
+			ggplot(data = ., aes(x = age, y = arrivals)) +
+			geom_col(fill = "#bc80bd") +
+			labs(
+				title = "Type of Visa by Age",
+				subtitle = subtitle,
+				x = "Ages",
+				y = "Arrivals"
+			) +
+			scale_y_continuous(labels = comma) +
+			scale_x_discrete(labels = ages) +
+			theme_few()
+	)
 	# citizenship ####
 	output$citizenship_plot <- renderPlot(
 		arrivals_by_citizenship %>%

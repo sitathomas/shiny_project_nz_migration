@@ -4,6 +4,7 @@ shinyUI(
 	  dashboardHeader(
 	  	title = "Exploring Migration to New Zealand",
 	  	titleWidth = "100%"),
+		# sidebar ####
 	  dashboardSidebar(
 		  sidebarMenu(
 		    menuItem("Region Data", tabName = "region", icon = icon("compass")),
@@ -42,7 +43,18 @@ shinyUI(
 	      tabItem(tabName = "visa",
 	        p("Citizens returning to the country or moving from Australia make up
 	        the majority of arrivals, followed by migrants with work visas."),
-	        plotOutput("arrivals_by_visa")
+	        plotOutput("arrivals_by_visa"),
+	      	p("Given that work and student visas combined make up the majority of
+	      		arrivals, it is unsurprising that most arrivals are late teens to
+	      		young adults. The number of citizens returning to New Zealand peaks
+	      		in ages 25-29, potentially indicating education and/or early career
+	      		opportunities were pursued overseas."),
+	      	selectizeInput(
+	      		inputId = "visa_type",
+	      		label = "Select a Type of Visa to Sort Arrivals by Age",
+	      		choices = unique(arrivals_by_age$visa_type)
+	      	),
+	      	plotOutput("select_visa_by_age")
 	      ),
 
 	      # citizenship ####
@@ -76,11 +88,12 @@ shinyUI(
 	        citizens returning after college education elsewhere."),
 	        plotOutput("age_by_year"),
 
-	        p("As to be expected, the type of visa largely correlates with
-	        standard life cycles - the young are students, young adults are
-	        workers, and seniors are likely retirees. Citizens returning to New
-	        Zealand peak in their 50s, possibly returning as empty-nesters after
-	        children become independent, or to care for aging parents."),
+	        p("As to be expected, the ratio of visa type to arrivals for a given
+	        age group largely correlates with standard life cycles. Most arrivals
+	        in their 20s and 30s are students and workers, and seniors with a
+	        Residence visa are likely retirees. Most arrivals in their 50s are
+	        citizens, possibly returning as empty-nesters after children become
+	        independent, or to care for aging parents."),
 	        plotOutput("age_by_visa")
 	      ),
 
