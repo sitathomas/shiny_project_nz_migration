@@ -13,24 +13,14 @@ library(shinydashboard)
 library(DT)
 library(rsconnect)
 
-# nz_regions ####
-nz_regions <-
-	readOGR(
-		dsn="./data/statsnzregional-council-2020-generalised-SHP",
-  	layer="regional-council-2020-generalised",
-		verbose = F
-	)
-nz_regions <- nz_regions[1:16,]
-nz_regions <- spTransform(nz_regions, CRS("+proj=longlat +datum=WGS84"))
-
-# occupation ####
+# occupation preprocessing ####
 arrivals_by_occup <- read_csv("data/arrivals_by_occup.csv", col_names = T, skip = 3)
 arrivals_by_occup <- arrivals_by_occup[-(9:44),]
 colnames(arrivals_by_occup)[1] = "year"
 colnames(arrivals_by_occup)[10] = "total_occup"
 arrivals_by_occup
 
-# gender ####
+# gender preprocessing ####
 arrivals_by_gender <-
 	read_csv("data/arrivals_by_gender.csv", col_names = T, skip = 4)
 arrivals_by_gender <- arrivals_by_gender[-(9:41),]
@@ -45,7 +35,7 @@ males <- arrivals_by_gender %>%
 arrivals_by_gender <- inner_join(females, males, by = c("year", "visa_type")) %>%
 	pivot_longer(., 3:4, names_to = "gender", values_to = "arrivals")
 
-# age ####
+# age preprocessing ####
 arrivals_by_age <-
 	read_csv("data/arrivals_by_age.csv", col_names = T, skip = 4)
 arrivals_by_age <- arrivals_by_age[-(9:41),]
@@ -166,14 +156,14 @@ ages <- c(
 			"age_70_74" = "70 to 74", "age_75_up" = "75 and up"
 		)
 
-# citizenship ####
+# citizenship preprocessing ####
 arrivals_by_citizenship <- read_csv("data/arrivals_by_citizenship.csv", col_names = T)
 colnames(arrivals_by_citizenship) <- gsub(" ", "_", colnames(arrivals_by_citizenship))
 colnames(arrivals_by_citizenship) <- tolower(colnames(arrivals_by_citizenship))
 arrivals_by_citizenship <- arrivals_by_citizenship %>%
 	pivot_longer(., 2:14, names_to = "citizenship", values_to = "arrivals")
 
-# area ####
+# area preprocessing ####
 arrivals_by_area <- read_csv("data/arrivals_by_area.csv", col_names = T, skip = 4)
 arrivals_by_area <- arrivals_by_area[-(9:49),]
 colnames(arrivals_by_area)[1] = "year"
@@ -183,7 +173,17 @@ arrivals_by_area <- arrivals_by_area %>%
 	group_by(., year, area) %>%
 	summarise(., arrivals = sum(arrivals))
 
-# ggplot ####
+# ggplot preprocessing ####
 subtitle <- "Permanent and Long-Term Migration to New Zealand, 2010 - 2017"
 x_commas <- scale_x_continuous(labels = comma)
 y_commas <- scale_y_continuous(labels = comma)
+
+# nz_regions preprocessing ####
+nz_regions <-
+	readOGR(
+		dsn="./data/statsnzregional-council-2020-generalised-SHP",
+  	layer="regional-council-2020-generalised",
+		verbose = F
+	)
+nz_regions <- nz_regions[1:16,]
+nz_regions <- spTransform(nz_regions, CRS("+proj=longlat +datum=WGS84"))

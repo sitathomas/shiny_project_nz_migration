@@ -3,15 +3,13 @@ shinyUI(
 	  skin = "green",
 	  dashboardHeader(title = "Exploring Migration to New Zealand", titleWidth = "100%"),
 	  dashboardSidebar(
-	  	# sidebar menu ####
 		  sidebarMenu(
 		    menuItem("Region Data", tabName = "region", icon = icon("compass")),
 		    menuItem("Visa Data", tabName = "visa", icon = icon("stamp")),
 		    menuItem("Citizenship Data", tabName = "citizenship", icon = icon("passport")),
 		    menuItem("Occupation Data", tabName = "occupation", icon = icon("briefcase")),
 		    menuItem("Age Data", tabName = "age", icon = icon("clock")),
-		    menuItem("Gender Data", tabName = "gender", icon = icon("users")),
-		  	menuItem("Data Tables", tabName = "datatables", icon = icon("database"))
+		    menuItem("Gender Data", tabName = "gender", icon = icon("users"))
 	    )
 	  ),
 	  dashboardBody(
@@ -20,8 +18,8 @@ shinyUI(
 	      tabItem(tabName = "region",
 	        p("Here you can explore some of the data available for Permanent and Long-Term
 	            Migration to New Zealand from 2010-2017. The raw data can be found under the
-	            headings 'Subject Categories' > 'Tourism' > 'International Travel and Migration'
-	        		at", tags$a(href="http://archive.stats.govt.nz/infoshare/", "Stats NZ")),
+	            headings Subject Categories > Tourism > International Travel and Migration at:"),
+	        p("http://archive.stats.govt.nz/infoshare/"),
 	        leafletOutput("nz_regions"),
 
 	        p("The vast majority of migrants land in the Auckland area, followed by Canturbury
@@ -87,15 +85,8 @@ shinyUI(
 	            therefore be more likely to seek visas based on their relationships rather than
 	            work or student visas."),
 	        plotOutput("visa_by_gender")
-	      ),
-	    	# data tables ####
-	    	tabItem(tabName = "datatables",
-    			DTOutput("arrivals_by_area"),
-    			DTOutput("arrivals_by_occup"),
-					DTOutput("arrivals_by_citizenship"),
-    			DTOutput("arrivals_by_age"),
-    			DTOutput("arrivals_by_gender")
-    		)
+	      )
+
 	    ),
 	      # CSS ####
 	      tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "custom.css"))
