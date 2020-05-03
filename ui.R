@@ -18,7 +18,8 @@ shinyUI(
 		    	tabName = "occupation",
 		    	icon = icon("briefcase")),
 		    menuItem("Age Data", tabName = "age", icon = icon("clock")),
-		    menuItem("Gender Data", tabName = "gender", icon = icon("users"))
+		    menuItem("Gender Data", tabName = "gender", icon = icon("users")),
+		  	menuItem("Data Tables", tabName = "datatables", icon = icon("data"))
 	    )
 	  ),
 	  dashboardBody(
@@ -27,11 +28,6 @@ shinyUI(
 	      tabItem(tabName = "region",
 	      	p("Here you can explore some of the data available for Permanent and
 	      		Long-Term Migration to New Zealand from 2010-2017."),
-	      	p("The raw data can be found under the headings Subject Categories >
-	      		Tourism > International Travel and Migration at",
-	      		tags$a(href = "http://archive.stats.govt.nz/infoshare/",
-	      		"Stats NZ", ".")
-	      	),
 	        leafletOutput("nz_regions"),
 
 	        p("The vast majority of migrants land in the Auckland area, followed
@@ -44,6 +40,7 @@ shinyUI(
 	        p("Citizens returning to the country or moving from Australia make up
 	        the majority of arrivals, followed by migrants with work visas."),
 	        plotOutput("arrivals_by_visa"),
+
 	      	p("Given that work and student visas combined make up the majority of
 	      		arrivals, it is unsurprising that most arrivals are late teens to
 	      		young adults. The number of citizens returning to New Zealand peaks
@@ -111,7 +108,14 @@ shinyUI(
 	        men who migrate, and may therefore be more likely to seek visas based
 	        on their relationships rather than work or student visas."),
 	        plotOutput("visa_by_gender")
-	      )
+	      ),
+	    	tabItem(tabName = "datatables",
+	    		p("The raw data can be found under the headings Subject Categories >
+	      		Tourism > International Travel and Migration at",
+	    			tags$a(href = "http: /  / archive.stats.govt.nz / infoshare / ",
+	    				"Stats NZ", ".")
+	    		)
+    		)
 
 	    ),
       # CSS ####
