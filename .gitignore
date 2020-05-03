@@ -45,3 +45,5 @@ vignettes/*.pdf
 # pkgdown site
 docs/
 data/
+misc/
+rsconnect/
