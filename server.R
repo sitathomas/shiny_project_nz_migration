@@ -224,4 +224,7 @@ shinyServer(function(input, output) {
 			scale_fill_brewer(palette = "Set3") +
 			theme_few()
 	)
+
+	# datatables ####
+	output$area_table <- renderDT(arrivals_by_area)
 })

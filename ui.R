@@ -19,7 +19,7 @@ shinyUI(
 		    	icon = icon("briefcase")),
 		    menuItem("Age Data", tabName = "age", icon = icon("clock")),
 		    menuItem("Gender Data", tabName = "gender", icon = icon("users")),
-		  	menuItem("Data Tables", tabName = "datatables", icon = icon("data"))
+		  	menuItem("Data Tables", tabName = "datatables", icon = icon("database"))
 	    )
 	  ),
 	  dashboardBody(
@@ -114,7 +114,8 @@ shinyUI(
 	      		Tourism > International Travel and Migration at",
 	    			tags$a(href = "http: /  / archive.stats.govt.nz / infoshare / ",
 	    				"Stats NZ", ".")
-	    		)
+	    		),
+	    		DTOutput("area_table")
     		)
 
 	    ),
