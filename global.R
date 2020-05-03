@@ -11,6 +11,7 @@ library(leaflet)
 library(shiny)
 library(shinydashboard)
 library(DT)
+library(rsconnect)
 
 # occupation preprocessing ####
 arrivals_by_occup <- read_csv("data/arrivals_by_occup.csv", col_names = T, skip = 3)

@@ -1,0 +1,10 @@
+name: shiny_project
+title:
+username:
+account: sitathomas
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2231587
+bundleId: 3095561
+url: https://sitathomas.shinyapps.io/shiny_project/
+when: 1588476473.28558
