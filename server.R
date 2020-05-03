@@ -1,5 +1,5 @@
 shinyServer(function(input, output) {
-	# location ####
+	# region ####
 	output$nz_regions <- renderLeaflet(
 		leaflet() %>%
 			addProviderTiles("OpenTopoMap") %>%
@@ -30,6 +30,8 @@ shinyServer(function(input, output) {
 			x_commas +
 			theme_few()
 	)
+
+	# visa ####
 	output$arrivals_by_visa <- renderPlot(
 		arrivals_by_gender %>%
 			group_by(., year, visa_type) %>%
@@ -49,43 +51,7 @@ shinyServer(function(input, output) {
 			scale_fill_brewer(palette = "Set3") +
 			theme_few()
 	)
-	# occupation ####
-	output$workers_by_year <- renderPlot(
-		arrivals_by_occup %>%
-			group_by(year) %>%
-			summarise(., arrivals = sum(total_occup)) %>%
-			ggplot(., aes(x = year, y = arrivals)) +
-			geom_col(fill = "#bc80bd") +
-			labs(
-				title = "Workers by Year: ANZSCO Major Occupations Only",
-				subtitle = subtitle,
-				x = "Year",
-				y = "Arrivals"
-			) +
-			y_commas +
-			theme_few()
-	)
-	output$workers_by_occup <- renderPlot(
-		arrivals_by_occup %>%
-			pivot_longer(
-				.,
-				cols = 2:9,
-				names_to = "occupation",
-				values_to = "arrivals"
-			) %>%
-			group_by(., occupation) %>%
-			summarise(., arrivals = sum(arrivals)) %>%
-			ggplot(data = ., aes(y = occupation, x = arrivals)) +
-			geom_col(fill = "#bc80bd") +
-			labs(
-				title = "Workers by Occupation: ANZSCO Major Occupations Only",
-				subtitle = subtitle,
-				y = "Occupation",
-				x = "Arrivals"
-			) +
-			x_commas +
-			theme_few()
-	)
+
 	# citizenship ####
 	output$citizenship_plot <- renderPlot(
 		arrivals_by_citizenship %>%
@@ -123,6 +89,45 @@ shinyServer(function(input, output) {
 			scale_y_continuous(labels = percent) +
 			theme_few()
 	)
+
+	# occupation ####
+	output$workers_by_year <- renderPlot(
+		arrivals_by_occup %>%
+			group_by(year) %>%
+			summarise(., arrivals = sum(total_occup)) %>%
+			ggplot(., aes(x = year, y = arrivals)) +
+			geom_col(fill = "#bc80bd") +
+			labs(
+				title = "Workers by Year: ANZSCO Major Occupations Only",
+				subtitle = subtitle,
+				x = "Year",
+				y = "Arrivals"
+			) +
+			y_commas +
+			theme_few()
+	)
+	output$workers_by_occup <- renderPlot(
+		arrivals_by_occup %>%
+			pivot_longer(
+				.,
+				cols = 2:9,
+				names_to = "occupation",
+				values_to = "arrivals"
+			) %>%
+			group_by(., occupation) %>%
+			summarise(., arrivals = sum(arrivals)) %>%
+			ggplot(data = ., aes(y = occupation, x = arrivals)) +
+			geom_col(fill = "#bc80bd") +
+			labs(
+				title = "Workers by Occupation: ANZSCO Major Occupations Only",
+				subtitle = subtitle,
+				y = "Occupation",
+				x = "Arrivals"
+			) +
+			x_commas +
+			theme_few()
+	)
+
 	# age ####
 	output$age_by_year <- renderPlot(
 		arrivals_by_age %>%
@@ -160,6 +165,7 @@ shinyServer(function(input, output) {
 			scale_fill_brewer(palette = "Set3") +
 			theme_few()
 	)
+
 	# gender ####
 	output$arrivals_by_gender <- renderPlot(
 		arrivals_by_gender %>%
