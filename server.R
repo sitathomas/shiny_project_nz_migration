@@ -59,18 +59,57 @@ shinyServer(function(input, output) {
 	)
 	output$select_visa_by_age <- renderPlot(
 		select_visa_by_age() %>%
-			ggplot(data = ., aes(x = age, y = arrivals)) +
+			ggplot(data = ., aes(x = arrivals, y = age)) +
 			geom_col(fill = "#bc80bd") +
 			labs(
 				title = "Type of Visa by Age",
 				subtitle = subtitle,
-				x = "Ages",
-				y = "Arrivals"
+				x = "Arrivals",
+				y = "Ages"
 			) +
-			scale_y_continuous(labels = comma) +
-			scale_x_discrete(labels = ages) +
+			scale_x_continuous(labels = comma) +
+			scale_y_discrete(labels = ages) +
 			theme_few()
 	)
+
+	# age ####
+	output$age_by_year <- renderPlot(
+		arrivals_by_age %>%
+			group_by(., year, age) %>%
+			summarise(., arrivals = sum(arrivals)) %>%
+			ggplot(data = ., aes(x = arrivals, y = age)) +
+			geom_col(fill = "#bc80bd") +
+			labs(
+				title = "Arrivals by Age",
+				subtitle = subtitle,
+				x = "Arrivals",
+				y = "Ages"
+			) +
+			x_commas +
+			scale_y_discrete(labels = ages) +
+			theme_few()
+	)
+	output$age_by_visa <- renderPlot(
+		arrivals_by_age %>%
+			group_by(., visa_type, age) %>%
+			summarise(., arrivals = sum(arrivals)) %>%
+			ggplot(data = ., aes(
+				x = arrivals, y = age, fill = visa_type
+			)) +
+			geom_col(position = "fill") +
+			labs(
+				title = "Age by Type of Visa",
+				subtitle = subtitle,
+				x = "Arrivals",
+				y = "Ages",
+				fill = "Type of Visa"
+			) +
+			scale_x_continuous(labels = percent) +
+			scale_y_discrete(labels = ages) +
+			scale_fill_brewer(palette = "Set3") +
+			theme_few()
+	)
+
 	# citizenship ####
 	output$citizenship_plot <- renderPlot(
 		arrivals_by_citizenship %>%
@@ -144,44 +183,6 @@ shinyServer(function(input, output) {
 				x = "Arrivals"
 			) +
 			x_commas +
-			theme_few()
-	)
-
-	# age ####
-	output$age_by_year <- renderPlot(
-		arrivals_by_age %>%
-			group_by(., year, age) %>%
-			summarise(., arrivals = sum(arrivals)) %>%
-			ggplot(data = ., aes(x = arrivals, y = age)) +
-			geom_col(fill = "#bc80bd") +
-			labs(
-				title = "Arrivals by Age",
-				subtitle = subtitle,
-				x = "Arrivals",
-				y = "Ages"
-			) +
-			x_commas +
-			scale_y_discrete(labels = ages) +
-			theme_few()
-	)
-	output$age_by_visa <- renderPlot(
-		arrivals_by_age %>%
-			group_by(., visa_type, age) %>%
-			summarise(., arrivals = sum(arrivals)) %>%
-			ggplot(data = ., aes(
-				x = arrivals, y = age, fill = visa_type
-			)) +
-			geom_col(position = "fill") +
-			labs(
-				title = "Age by Type of Visa",
-				subtitle = subtitle,
-				x = "Arrivals",
-				y = "Ages",
-				fill = "Type of Visa"
-			) +
-			scale_x_continuous(labels = percent) +
-			scale_y_discrete(labels = ages) +
-			scale_fill_brewer(palette = "Set3") +
 			theme_few()
 	)
 
