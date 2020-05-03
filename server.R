@@ -228,7 +228,7 @@ shinyServer(function(input, output) {
 	# datatables ####
 	output$area_table <- renderDT(arrivals_by_area)
 	output$citizenship_table <- renderDT(arrivals_by_citizenship)
-	output$occup_table <- renderDT(arrivals_by_occup)
+	output$occup_table <- renderDT(arrivals_by_occup, options = list(scrollX = T))
 	output$age_table <- renderDT(arrivals_by_age)
 	output$gender_table <- renderDT(arrivals_by_gender)
 })
