@@ -199,4 +199,11 @@ shinyServer(function(input, output) {
 			scale_fill_brewer(palette = "Set3") +
 			theme_few()
 	)
+	# datatables ####
+	output$arrivals_by_area <- renderDT(arrivals_by_area)
+	output$arrivals_by_occup <- renderDT(arrivals_by_occup)
+	output$arrivals_by_citizenship <- renderDT(arrivals_by_citizenship)
+	output$arrivals_by_age <- renderDT(arrivals_by_age)
+	output$arrivals_by_gender <- renderDT(arrivals_by_gender)
 })
+
